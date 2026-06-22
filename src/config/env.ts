@@ -30,13 +30,5 @@ export const env = {
       clientID: process.env.GITHUB_CLIENT_ID ?? '',
       clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
     },
-    apple: {
-      clientID: process.env.APPLE_CLIENT_ID ?? '',
-      teamID: process.env.APPLE_TEAM_ID ?? '',
-      keyID: process.env.APPLE_KEY_ID ?? '',
-      // A chave .p8 costuma vir com quebras de linha escapadas (\n) quando guardada
-      // em variáveis de ambiente; normalizamos para quebras reais antes de assinar.
-      privateKey: (process.env.APPLE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n'),
-    },
   },
 };

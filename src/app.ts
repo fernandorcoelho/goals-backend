@@ -15,8 +15,6 @@ export function createApp() {
 
   app.use(cors());
   app.use(express.json());
-  // A Apple devolve o callback como POST em form-urlencoded (response_mode=form_post).
-  app.use(express.urlencoded({ extended: false }));
   app.use(passport.initialize());
 
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));

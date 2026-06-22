@@ -78,11 +78,6 @@ registrada quando suas credenciais estão presentes:
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
 | Facebook | `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET` |
 | GitHub | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` |
-| Apple | `APPLE_CLIENT_ID`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY` |
-
-> A Apple usa um *client secret* assinado (JWT) gerado a partir do Team ID, Key
-> ID e da chave privada `.p8`. Como ela responde via `response_mode=form_post`,
-> seu callback é um **POST** e o nome do usuário só chega no **primeiro** login.
 
 ## Autenticação
 
@@ -93,8 +88,8 @@ emite um JWT próprio, enviado nas rotas protegidas via header
 | Método | Rota | Descrição |
 | --- | --- | --- |
 | `GET` | `/auth/providers` | Lista os provedores habilitados (com credenciais configuradas) |
-| `GET` | `/auth/:provider` | Inicia o fluxo OAuth (`google`, `facebook`, `github`, `apple`) |
-| `GET` | `/auth/:provider/callback` | Callback do provedor (a Apple usa `POST`) — emite o JWT |
+| `GET` | `/auth/:provider` | Inicia o fluxo OAuth (`google`, `facebook`, `github`) |
+| `GET` | `/auth/:provider/callback` | Callback do provedor — emite o JWT |
 
 ## Endpoints
 

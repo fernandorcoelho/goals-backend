@@ -14,16 +14,10 @@ authRoutes.get('/providers', (_req, res) => {
 // Para cada provedor habilitado, registramos o início do fluxo e o callback.
 // A rota `/auth/:provider` redireciona ao consentimento; `/auth/:provider/callback`
 // finaliza e emite o JWT.
-//
-// A Apple usa `response_mode=form_post`, então devolve o resultado via POST; os
-// demais provedores retornam via GET.
 for (const provider of enabledProviders()) {
   authRoutes.get(`/${provider}`, passport.authenticate(provider, { session: false }));
 
-  const registerCallback =
-    provider === 'apple' ? authRoutes.post.bind(authRoutes) : authRoutes.get.bind(authRoutes);
-
-  registerCallback(
+  authRoutes.get(
     `/${provider}/callback`,
     passport.authenticate(provider, { session: false, failureRedirect: '/auth/failure' }),
     asyncHandler(async (req, res) => oauthCallback(req, res)),
