@@ -1,0 +1,124 @@
+// Schema do banco de dados do app Goals.
+// Modela: usuários com login social, perfil, categorias com atribuições
+// e a rotina semanal (dias da semana -> categorias).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Provedores de login social suportados.
+enum AuthProvider {
+  GOOGLE
+  FACEBOOK
+  APPLE
+  GITHUB
+}
+
+/// Dias da semana usados na rotina.
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+/// Usuário do app. Não há cadastro: o usuário nasce do primeiro login social.
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  nickname  String?  @unique
+  photoUrl  String?
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts   Account[]
+  categories Category[]
+  routine    Routine?
+
+  @@map("users")
+}
+
+/// Vínculo entre um usuário e uma conta de um provedor OAuth.
+/// Um mesmo usuário pode ter várias contas (ex.: Google + GitHub).
+model Account {
+  id                String       @id @default(uuid())
+  provider          AuthProvider
+  providerAccountId String
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime     @default(now())
+
+  // Cada conta de provedor pertence a um único usuário.
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+/// Categoria criada pelo usuário (ex.: "Alimentação").
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items       CategoryItem[]
+  routineDays RoutineDay[]   @relation("RoutineDayCategories")
+
+  // Nomes de categoria são únicos por usuário.
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("categories")
+}
+
+/// Atribuição dentro de uma categoria (ex.: "Café da manhã", "Almoço").
+model CategoryItem {
+  id         String   @id @default(uuid())
+  name       String
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([categoryId])
+  @@map("category_items")
+}
+
+/// Rotina do usuário. Há no máximo uma rotina por usuário.
+model Routine {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  days RoutineDay[]
+
+  @@map("routines")
+}
+
+/// Um dia da semana dentro da rotina, com as categorias atribuídas a ele.
+/// A regra "no mínimo uma categoria por dia" é validada na camada de aplicação.
+model RoutineDay {
+  id        String   @id @default(uuid())
+  weekday   Weekday
+  routineId String
+  routine   Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories Category[] @relation("RoutineDayCategories")
+
+  // Cada dia da semana aparece no máximo uma vez por rotina.
+  @@unique([routineId, weekday])
+  @@map("routine_days")
+}
