@@ -1,0 +1,24 @@
+# Banco de dados local do app Goals.
+# Sobe um PostgreSQL que casa com a DATABASE_URL do .env
+# (usuário/senha/banco/porta). Suba com: docker compose up -d
+services:
+  db:
+    image: postgres:16
+    container_name: goals-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: goals
+    ports:
+      - '5432:5432'
+    volumes:
+      - goals-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d goals']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  goals-db-data:
