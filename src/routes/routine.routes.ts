@@ -10,4 +10,5 @@ routineRoutes.use(authMiddleware);
 routineRoutes.get('/', asyncHandler(show));
 // weekday usa o enum em maiúsculas: MONDAY..SUNDAY.
 routineRoutes.put('/days/:weekday', asyncHandler(setDay));
-routineRoutes.delete('/days/:weekday', asyncHandler(clear));
+// Esvazia o dia (remove as categorias). O dia permanece na semana.
+routineRoutes.put('/days/:weekday/clear', asyncHandler(clear));

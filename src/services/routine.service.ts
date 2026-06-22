@@ -1,6 +1,9 @@
-import type { Weekday } from '@prisma/client';
+import { Prisma, Weekday } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { badRequest } from '../errors/http-error.js';
+
+/// Ordem fixa dos dias da semana, igual para todos os usuários.
+const WEEKDAYS = Object.values(Weekday);
 
 const routineInclude = {
   days: {
@@ -8,6 +11,13 @@ const routineInclude = {
     include: { categories: { orderBy: { name: 'asc' } } },
   },
 } as const;
+
+/// Monta os sete dias da semana (sem categorias) para a rotina inicial de um
+/// usuário. Toda rotina nasce com a semana inteira pronta para receber
+/// categorias. Usado na criação da conta e sob demanda.
+export function initialRoutineDays(): Prisma.RoutineDayCreateNestedManyWithoutRoutineInput {
+  return { create: WEEKDAYS.map((weekday) => ({ weekday })) };
+}
 
 /// Retorna a rotina do usuário, criando-a sob demanda caso ainda não exista.
 /// Há no máximo uma rotina por usuário (relação 1:1).
@@ -22,7 +32,7 @@ export async function getOrCreateRoutine(userId: string) {
   }
 
   return prisma.routine.create({
-    data: { userId },
+    data: { userId, days: initialRoutineDays() },
     include: routineInclude,
   });
 }
@@ -59,10 +69,12 @@ export async function setDayCategories(userId: string, weekday: Weekday, categor
   });
 }
 
-/// Remove a configuração de um dia da rotina.
+/// Esvazia um dia da rotina, removendo todas as categorias atribuídas a ele.
+/// O dia permanece na semana: a rotina sempre mantém os sete dias.
 export async function clearDay(userId: string, weekday: Weekday): Promise<void> {
   const routine = await getOrCreateRoutine(userId);
-  await prisma.routineDay.deleteMany({
-    where: { routineId: routine.id, weekday },
+  await prisma.routineDay.update({
+    where: { routineId_weekday: { routineId: routine.id, weekday } },
+    data: { categories: { set: [] } },
   });
 }

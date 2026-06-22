@@ -1,5 +1,6 @@
 import type { AuthProvider, User } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
+import { initialRoutineDays } from './routine.service.js';
 
 export interface OAuthProfile {
   provider: AuthProvider;
@@ -37,6 +38,7 @@ export async function findOrCreateUserFromOAuth(profile: OAuthProfile): Promise<
           providerAccountId: profile.providerAccountId,
         },
       },
+      routine: { create: { days: initialRoutineDays() } },
     },
   });
 }

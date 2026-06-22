@@ -121,7 +121,7 @@ Todas as rotas abaixo exigem `Authorization: Bearer <token>`.
 | --- | --- | --- |
 | `GET` | `/routine` | Retorna a rotina |
 | `PUT` | `/routine/days/:weekday` | Define as categorias do dia (`weekday`: `MONDAY`..`SUNDAY`) |
-| `DELETE` | `/routine/days/:weekday` | Limpa o dia |
+| `PUT` | `/routine/days/:weekday/clear` | Esvazia o dia (remove as categorias; o dia permanece) |
 
 **Saúde**
 
