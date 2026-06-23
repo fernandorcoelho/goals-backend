@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import {
   create,
-  createItem,
+  createTask,
   destroy,
-  destroyItem,
+  destroyTask,
   index,
   show,
   update,
-  updateItem,
+  updateTask,
 } from '../controllers/category.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { asyncHandler } from '../lib/async-handler.js';
@@ -22,6 +22,6 @@ categoryRoutes.get('/:id', asyncHandler(show));
 categoryRoutes.patch('/:id', asyncHandler(update));
 categoryRoutes.delete('/:id', asyncHandler(destroy));
 
-categoryRoutes.post('/:id/items', asyncHandler(createItem));
-categoryRoutes.patch('/:id/items/:itemId', asyncHandler(updateItem));
-categoryRoutes.delete('/:id/items/:itemId', asyncHandler(destroyItem));
+categoryRoutes.post('/:id/tasks', asyncHandler(createTask));
+categoryRoutes.patch('/:id/tasks/:taskId', asyncHandler(updateTask));
+categoryRoutes.delete('/:id/tasks/:taskId', asyncHandler(destroyTask));

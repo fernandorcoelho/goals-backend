@@ -2,14 +2,14 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { requireUserId } from '../middlewares/auth.middleware.js';
 import {
-  addItem,
+  addTask,
   createCategory,
   deleteCategory,
-  deleteItem,
+  deleteTask,
   getCategory,
   listCategories,
   renameCategory,
-  renameItem,
+  renameTask,
 } from '../services/category.service.js';
 
 const nameSchema = z.object({ name: z.string().trim().min(1).max(120) }).strict();
@@ -40,19 +40,19 @@ export async function destroy(req: Request, res: Response): Promise<void> {
   res.status(204).send();
 }
 
-export async function createItem(req: Request, res: Response): Promise<void> {
+export async function createTask(req: Request, res: Response): Promise<void> {
   const { name } = nameSchema.parse(req.body);
-  const item = await addItem(requireUserId(req), req.params.id, name);
-  res.status(201).json(item);
+  const task = await addTask(requireUserId(req), req.params.id, name);
+  res.status(201).json(task);
 }
 
-export async function updateItem(req: Request, res: Response): Promise<void> {
+export async function updateTask(req: Request, res: Response): Promise<void> {
   const { name } = nameSchema.parse(req.body);
-  const item = await renameItem(requireUserId(req), req.params.id, req.params.itemId, name);
-  res.json(item);
+  const task = await renameTask(requireUserId(req), req.params.id, req.params.taskId, name);
+  res.json(task);
 }
 
-export async function destroyItem(req: Request, res: Response): Promise<void> {
-  await deleteItem(requireUserId(req), req.params.id, req.params.itemId);
+export async function destroyTask(req: Request, res: Response): Promise<void> {
+  await deleteTask(requireUserId(req), req.params.id, req.params.taskId);
   res.status(204).send();
 }

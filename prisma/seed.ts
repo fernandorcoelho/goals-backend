@@ -23,7 +23,7 @@ async function main() {
     data: {
       name: 'Alimentação',
       userId: user.id,
-      items: {
+      tasks: {
         create: [{ name: 'Café da manhã' }, { name: 'Almoço' }, { name: 'Jantar' }],
       },
     },
@@ -33,7 +33,7 @@ async function main() {
     data: {
       name: 'Exercícios',
       userId: user.id,
-      items: { create: [{ name: 'Corrida' }, { name: 'Musculação' }] },
+      tasks: { create: [{ name: 'Corrida' }, { name: 'Musculação' }] },
     },
   });
 

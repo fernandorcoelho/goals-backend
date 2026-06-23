@@ -70,7 +70,7 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items       CategoryItem[]
+  tasks       CategoryTask[]
   routineDays RoutineDay[]   @relation("RoutineDayCategories")
 
   // Nomes de categoria são únicos por usuário.
@@ -79,8 +79,8 @@ model Category {
   @@map("categories")
 }
 
-/// Atribuição dentro de uma categoria (ex.: "Café da manhã", "Almoço").
-model CategoryItem {
+/// Tarefa dentro de uma categoria (ex.: "Café da manhã", "Almoço").
+model CategoryTask {
   id         String   @id @default(uuid())
   name       String
   categoryId String
@@ -89,7 +89,7 @@ model CategoryItem {
   updatedAt  DateTime @updatedAt
 
   @@index([categoryId])
-  @@map("category_items")
+  @@map("category_tasks")
 }
 
 /// Rotina do usuário. Há no máximo uma rotina por usuário.
