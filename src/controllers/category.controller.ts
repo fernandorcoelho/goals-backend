@@ -10,9 +10,18 @@ import {
   listCategories,
   renameCategory,
   renameTask,
+  setTasksCompletion,
 } from '../services/category.service.js';
 
 const nameSchema = z.object({ name: z.string().trim().min(1).max(120) }).strict();
+
+const completionSchema = z
+  .object({
+    tasks: z
+      .array(z.object({ id: z.string().uuid(), completed: z.boolean() }).strict())
+      .min(1),
+  })
+  .strict();
 
 export async function index(req: Request, res: Response): Promise<void> {
   res.json(await listCategories(requireUserId(req)));
@@ -55,4 +64,10 @@ export async function updateTask(req: Request, res: Response): Promise<void> {
 export async function destroyTask(req: Request, res: Response): Promise<void> {
   await deleteTask(requireUserId(req), req.params.id, req.params.taskId);
   res.status(204).send();
+}
+
+export async function updateTasksCompletion(req: Request, res: Response): Promise<void> {
+  const { tasks } = completionSchema.parse(req.body);
+  const updated = await setTasksCompletion(requireUserId(req), tasks);
+  res.json(updated);
 }

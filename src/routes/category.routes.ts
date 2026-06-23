@@ -8,6 +8,7 @@ import {
   show,
   update,
   updateTask,
+  updateTasksCompletion,
 } from '../controllers/category.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { asyncHandler } from '../lib/async-handler.js';
@@ -18,6 +19,9 @@ categoryRoutes.use(authMiddleware);
 
 categoryRoutes.get('/', asyncHandler(index));
 categoryRoutes.post('/', asyncHandler(create));
+
+categoryRoutes.patch('/tasks/completion', asyncHandler(updateTasksCompletion));
+
 categoryRoutes.get('/:id', asyncHandler(show));
 categoryRoutes.patch('/:id', asyncHandler(update));
 categoryRoutes.delete('/:id', asyncHandler(destroy));

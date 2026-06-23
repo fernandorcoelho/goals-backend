@@ -111,9 +111,10 @@ Todas as rotas abaixo exigem `Authorization: Bearer <token>`.
 | `GET` | `/categories/:id` | Detalha categoria |
 | `PATCH` | `/categories/:id` | Atualiza categoria |
 | `DELETE` | `/categories/:id` | Remove categoria |
-| `POST` | `/categories/:id/items` | Adiciona atribuição |
-| `PATCH` | `/categories/:id/items/:itemId` | Atualiza atribuição |
-| `DELETE` | `/categories/:id/items/:itemId` | Remove atribuição |
+| `POST` | `/categories/:id/tasks` | Adiciona tarefa |
+| `PATCH` | `/categories/:id/tasks/:taskId` | Atualiza tarefa |
+| `DELETE` | `/categories/:id/tasks/:taskId` | Remove tarefa |
+| `PATCH` | `/categories/tasks/completion` | Marca/desmarca tarefas como concluídas em lote |
 
 **Rotina semanal**
 

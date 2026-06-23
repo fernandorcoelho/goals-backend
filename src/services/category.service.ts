@@ -84,3 +84,46 @@ export async function deleteTask(userId: string, categoryId: string, taskId: str
   await getOwnedTask(userId, categoryId, taskId);
   await prisma.categoryTask.delete({ where: { id: taskId } });
 }
+
+type TaskCompletion = { id: string; completed: boolean };
+
+/// Garante que todas as tarefas informadas existem e pertencem ao usuário.
+/// Falha se alguma não for encontrada, evitando atualizações parciais.
+async function assertOwnedTasks(userId: string, taskIds: string[]): Promise<void> {
+  const owned = await prisma.categoryTask.count({
+    where: { id: { in: taskIds }, category: { userId } },
+  });
+
+  if (owned !== taskIds.length) {
+    throw notFound('Tarefa não encontrada.');
+  }
+}
+
+/// Marca/desmarca em lote as tarefas como concluídas. Agrupa pelo valor de
+/// `completed` para resolver tudo em duas escritas, dentro de uma transação.
+export async function setTasksCompletion(userId: string, completions: TaskCompletion[]) {
+  await assertOwnedTasks(userId, completions.map((completion) => completion.id));
+
+  const completedIds = completions
+    .filter((completion) => completion.completed)
+    .map((completion) => completion.id);
+  const uncompletedIds = completions
+    .filter((completion) => !completion.completed)
+    .map((completion) => completion.id);
+
+  await prisma.$transaction([
+    prisma.categoryTask.updateMany({
+      where: { id: { in: completedIds } },
+      data: { completed: true },
+    }),
+    prisma.categoryTask.updateMany({
+      where: { id: { in: uncompletedIds } },
+      data: { completed: false },
+    }),
+  ]);
+
+  return prisma.categoryTask.findMany({
+    where: { id: { in: completions.map((completion) => completion.id) } },
+    orderBy: { createdAt: 'asc' },
+  });
+}
