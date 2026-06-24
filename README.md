@@ -1,7 +1,7 @@
 # Goals — Backend
 
-Servidor do app **Goals**: login social (sem cadastro), perfil, categorias com
-atribuições e rotina semanal.
+Servidor do app **Goals**: login social (sem cadastro), perfil e rotina semanal
+com tarefas cadastradas diretamente em cada dia.
 
 ## Stack
 
@@ -102,27 +102,15 @@ Todas as rotas abaixo exigem `Authorization: Bearer <token>`.
 | `GET` | `/me` | Dados do usuário autenticado |
 | `PATCH` | `/me` | Atualiza o perfil |
 
-**Categorias e atribuições**
+**Rotina semanal e tarefas**
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| `GET` | `/categories` | Lista categorias |
-| `POST` | `/categories` | Cria categoria |
-| `GET` | `/categories/:id` | Detalha categoria |
-| `PATCH` | `/categories/:id` | Atualiza categoria |
-| `DELETE` | `/categories/:id` | Remove categoria |
-| `POST` | `/categories/:id/tasks` | Adiciona tarefa |
-| `PATCH` | `/categories/:id/tasks/:taskId` | Atualiza tarefa |
-| `DELETE` | `/categories/:id/tasks/:taskId` | Remove tarefa |
-| `PATCH` | `/categories/tasks/completion` | Marca/desmarca tarefas como concluídas em lote |
-
-**Rotina semanal**
-
-| Método | Rota | Descrição |
-| --- | --- | --- |
-| `GET` | `/routine` | Retorna a rotina |
-| `PUT` | `/routine/days/:weekday` | Define as categorias do dia (`weekday`: `MONDAY`..`SUNDAY`) |
-| `PUT` | `/routine/days/:weekday/clear` | Esvazia o dia (remove as categorias; o dia permanece) |
+| `GET` | `/routine` | Retorna a rotina com os sete dias e suas tarefas |
+| `POST` | `/routine/days/:weekday/tasks` | Cria uma tarefa no dia (`weekday`: `MONDAY`..`SUNDAY`) |
+| `PATCH` | `/routine/tasks/:id` | Atualiza uma tarefa |
+| `DELETE` | `/routine/tasks/:id` | Remove uma tarefa |
+| `PATCH` | `/routine/tasks/completion` | Marca/desmarca tarefas como concluídas em lote |
 
 **Saúde**
 

@@ -5,7 +5,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-/// Popula um usuário de exemplo com categorias, atribuições e uma rotina simples
+/// Popula um usuário de exemplo com uma rotina simples e tarefas em alguns dias
 /// para facilitar o desenvolvimento local.
 async function main() {
   const user = await prisma.user.create({
@@ -16,36 +16,28 @@ async function main() {
       accounts: {
         create: { provider: 'GOOGLE', providerAccountId: 'seed-google-1' },
       },
-    },
-  });
-
-  const alimentacao = await prisma.category.create({
-    data: {
-      name: 'Alimentação',
-      userId: user.id,
-      tasks: {
-        create: [{ name: 'Café da manhã' }, { name: 'Almoço' }, { name: 'Jantar' }],
+      routine: {
+        create: {
+          days: {
+            create: Object.values(Weekday).map((weekday) => ({ weekday })),
+          },
+        },
       },
     },
+    include: { routine: { include: { days: true } } },
   });
 
-  const exercicios = await prisma.category.create({
-    data: {
-      name: 'Exercícios',
-      userId: user.id,
-      tasks: { create: [{ name: 'Corrida' }, { name: 'Musculação' }] },
-    },
-  });
+  const monday = user.routine?.days.find((day) => day.weekday === Weekday.MONDAY);
 
-  const routine = await prisma.routine.create({ data: { userId: user.id } });
-
-  await prisma.routineDay.create({
-    data: {
-      weekday: Weekday.MONDAY,
-      routineId: routine.id,
-      categories: { connect: [{ id: alimentacao.id }, { id: exercicios.id }] },
-    },
-  });
+  if (monday) {
+    await prisma.task.createMany({
+      data: [
+        { name: 'Café da manhã', routineDayId: monday.id },
+        { name: 'Almoço', routineDayId: monday.id },
+        { name: 'Corrida', routineDayId: monday.id },
+      ],
+    });
+  }
 
   console.log(`Seed concluído. Usuário: ${user.id}`);
 }

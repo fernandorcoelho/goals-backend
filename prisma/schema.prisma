@@ -1,6 +1,6 @@
 // Schema do banco de dados do app Goals.
-// Modela: usuários com login social, perfil, categorias com atribuições
-// e a rotina semanal (dias da semana -> categorias).
+// Modela: usuários com login social, perfil e a rotina semanal, onde as tarefas
+// são cadastradas diretamente em cada dia da semana.
 
 generator client {
   provider = "prisma-client-js"
@@ -38,9 +38,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts   Account[]
-  categories Category[]
-  routine    Routine?
+  accounts Account[]
+  routine  Routine?
 
   @@map("users")
 }
@@ -61,38 +60,6 @@ model Account {
   @@map("accounts")
 }
 
-/// Categoria criada pelo usuário (ex.: "Alimentação").
-model Category {
-  id        String   @id @default(uuid())
-  name      String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tasks       CategoryTask[]
-  routineDays RoutineDay[]   @relation("RoutineDayCategories")
-
-  // Nomes de categoria são únicos por usuário.
-  @@unique([userId, name])
-  @@index([userId])
-  @@map("categories")
-}
-
-/// Tarefa dentro de uma categoria (ex.: "Café da manhã", "Almoço").
-model CategoryTask {
-  id         String   @id @default(uuid())
-  name       String
-  completed  Boolean  @default(false)
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([categoryId])
-  @@map("category_tasks")
-}
-
 /// Rotina do usuário. Há no máximo uma rotina por usuário.
 model Routine {
   id        String   @id @default(uuid())
@@ -106,8 +73,7 @@ model Routine {
   @@map("routines")
 }
 
-/// Um dia da semana dentro da rotina, com as categorias atribuídas a ele.
-/// A regra "no mínimo uma categoria por dia" é validada na camada de aplicação.
+/// Um dia da semana dentro da rotina, com as tarefas cadastradas nele.
 model RoutineDay {
   id        String   @id @default(uuid())
   weekday   Weekday
@@ -116,9 +82,23 @@ model RoutineDay {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories Category[] @relation("RoutineDayCategories")
+  tasks Task[]
 
   // Cada dia da semana aparece no máximo uma vez por rotina.
   @@unique([routineId, weekday])
   @@map("routine_days")
+}
+
+/// Tarefa cadastrada diretamente em um dia da rotina (ex.: "Café da manhã").
+model Task {
+  id           String     @id @default(uuid())
+  name         String
+  completed    Boolean    @default(false)
+  routineDayId String
+  routineDay   RoutineDay @relation(fields: [routineDayId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([routineDayId])
+  @@map("tasks")
 }

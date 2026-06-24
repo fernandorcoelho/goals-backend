@@ -27,7 +27,7 @@ export function errorMiddleware(
     return;
   }
 
-  // Violação de restrição única (ex.: apelido ou nome de categoria repetido).
+  // Violação de restrição única (ex.: apelido já em uso).
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
     res.status(409).json({ error: 'Registro já existe (violação de unicidade).' });
     return;
